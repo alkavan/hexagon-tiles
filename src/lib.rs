@@ -1,7 +1,8 @@
-pub mod hexagon;
+pub mod hex;
+pub mod fractional;
 pub mod point;
-pub mod tools;
+pub mod util;
 pub mod layout;
-
-#[cfg(test)]
-mod tests;
+pub mod traits;
+pub mod doubled;
+pub mod offset;

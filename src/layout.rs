@@ -1,7 +1,10 @@
 use std::f64::consts::PI;
+use std::ops::Neg;
+use num::PrimInt;
+use crate::fractional::FractionalHex;
 
-use crate::hexagon::{Hex, FractionalHex};
-use crate::point::Point;
+use crate::hex::Hex;
+use crate::point::{Point, point};
 
 const SQRT_3: f64 = 1.73205080756888;
 
@@ -49,61 +52,50 @@ pub struct Layout {
     pub origin: Point,
 }
 
-pub struct LayoutTool;
+pub fn hex_to_pixel<I: PrimInt + Neg<Output = I> + Into<f64>>(layout: Layout, hex: Hex<I>) -> Point {
+    let orientation = layout.orientation;
+    let size = layout.size;
+    let origin = layout.origin;
 
-impl LayoutTool {
-    pub fn hex_to_pixel(layout: Layout, hex: Hex) -> Point {
-        let orientation: Orientation = layout.orientation;
-        let size: Point = layout.size;
-        let origin: Point = layout.origin;
+    let x = (orientation.f0 * hex.q().into() + orientation.f1 * hex.r().into()) * size.x;
+    let y = (orientation.f2 * hex.q().into() + orientation.f3 * hex.r().into()) * size.y;
 
-        let x: f64 = (orientation.f0 * hex.q() as f64 + orientation.f1 * hex.r() as f64) * size.x;
-        let y: f64 = (orientation.f2 * hex.q() as f64 + orientation.f3 * hex.r() as f64) * size.y;
+    point(x + origin.x, y + origin.y)
+}
 
-        return Point {
-            x: x + origin.x,
-            y: y + origin.y,
-        };
-    }
+//TODO make these generic too
+pub fn pixel_to_hex(layout: Layout, point: Point) -> FractionalHex<f64> {
+    let orientation = layout.orientation;
+    let size = layout.size;
+    let origin = layout.origin;
 
-    pub fn pixel_to_hex(layout: Layout, point: Point) -> FractionalHex {
-        let orientation: Orientation = layout.orientation;
-        let size: Point = layout.size;
-        let origin: Point = layout.origin;
-        let pt: Point = Point {
-            x: (point.x - origin.x) / size.x,
-            y: (point.y - origin.y) / size.y,
-        };
+    let pt = Point {
+        x: (point.x - origin.x) / size.x,
+        y: (point.y - origin.y) / size.y,
+    };
 
-        let q: f64 = orientation.b0 * pt.x + orientation.b1 * pt.y;
-        let r: f64 = orientation.b2 * pt.x + orientation.b3 * pt.y;
+    let q = orientation.b0 * pt.x + orientation.b1 * pt.y;
+    let r = orientation.b2 * pt.x + orientation.b3 * pt.y;
 
-        return FractionalHex::new(q, r);
-    }
+    FractionalHex::new(q, r)
+}
 
-    pub fn corner_offset(layout: Layout, corner: i32) -> Point {
-        let orientation: Orientation = layout.orientation;
-        let size: Point = layout.size;
-        let angle: f64 = 2.0 * PI * (orientation.start_angle - corner as f64) / 6.0;
+pub fn corner_offset(layout: Layout, corner: i32) -> Point {
+    let orientation = layout.orientation;
+    let size = layout.size;
+    let angle = 2.0 * PI * (orientation.start_angle - corner as f64) / 6.0;
 
-        return Point {
-            x: size.x * angle.cos(),
-            y: size.y * angle.sin(),
-        };
-    }
+    point(size.x * angle.cos(), size.y * angle.sin())
+}
 
-    pub fn polygon_corners(layout: Layout, hex: Hex) -> Vec<Point> {
-        let mut corners: Vec<Point> = vec![];
-        let center: Point = LayoutTool::hex_to_pixel(layout, hex);
+pub fn polygon_corners<I: PrimInt + Neg<Output = I> + Into<f64>>(layout: Layout, hex: Hex<I>) -> Vec<Point> {
+    let center = hex_to_pixel(layout, hex);
 
-        for i in 0..(6) {
-            let offset: Point = LayoutTool::corner_offset(layout, i);
-            corners.push(Point {
-                x: center.x + offset.x,
-                y: center.y + offset.y,
-            });
-        }
+    (0..(6))
+        .map(|i| {
+            let offset = corner_offset(layout, i);
 
-        return corners;
-    }
+            point(center.x + offset.x, center.y + offset.y)
+        })
+        .collect()
 }
