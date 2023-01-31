@@ -82,3 +82,14 @@ impl<I: PrimInt> Div<I> for OffsetCoord<I> {
         Self { col, row }
     }
 }
+
+impl<I: PrimInt + Neg<Output = I>> Neg for OffsetCoord<I> {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        let col = -self.col;
+        let row = -self.row;
+
+        Self { col, row }
+    }
+}

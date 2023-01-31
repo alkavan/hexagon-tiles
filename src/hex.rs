@@ -85,6 +85,18 @@ impl<I: PrimInt> Div<I> for Hex<I> {
     }
 }
 
+impl<I: PrimInt + Neg<Output = I>> Neg for Hex<I> {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        let q = -self.q;
+        let r = -self.r;
+        let s = -self.s;
+
+        Self { q, r, s }
+    }
+}
+
 impl HexDirection for Hex<i8> {
     #[rustfmt::skip]
     const NEIGHBORS: [Self; 6] = [

@@ -71,4 +71,15 @@ impl<I: PrimInt> Mul<I> for DoubledCoord<I> {
     }
 }
 
+impl<I: PrimInt + Neg<Output = I>> Neg for DoubledCoord<I> {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        let col = -self.col;
+        let row = -self.row;
+
+        Self { col, row }
+    }
+}
+
 // note by Madeline Sparkles: idk how division works so we left it out.

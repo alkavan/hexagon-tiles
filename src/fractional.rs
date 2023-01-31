@@ -83,6 +83,18 @@ impl<F: Float> Div<F> for FractionalHex<F> {
     }
 }
 
+impl<F: Float + Neg<Output = F>> Neg for FractionalHex<F> {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        let q = -self.q;
+        let r = -self.r;
+        let s = -self.s;
+
+        Self { q, r, s }
+    }
+}
+
 impl<F: Float> HexRound<F> for FractionalHex<F> {
     fn round<I: PrimInt + Neg<Output = I>>(self) -> Hex<I> {
         let qf = self.q.round();
