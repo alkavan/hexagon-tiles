@@ -1,10 +1,14 @@
+extern crate float_eq;
+use float_eq::assert_float_eq;
+
 use crate::hexagon::{
-    Hex, FractionalHex, OffsetCoord, DoubledCoord,
-    HexMath, HexRotation, HexRound, HexUtility,
+    DoubledCoord, FractionalHex, Hex, HexMath, HexRotation, HexRound, HexUtility, OffsetCoord,
 };
-use crate::point::Point;
-use crate::tools::{HexOffset, HexDoubled, HexDirection, HEX_EVEN, HEX_ODD};
 use crate::layout::{Layout, LayoutTool, LAYOUT_ORIENTATION_FLAT, LAYOUT_ORIENTATION_POINTY};
+use crate::point::Point;
+use crate::tools::{HexDirection, HexDoubled, HexOffset, HEX_EVEN, HEX_ODD};
+
+use std::collections::HashMap;
 
 #[test]
 fn test_s_component() {
@@ -334,4 +338,34 @@ pub fn test_doubled_to_cube() {
 
     let coord2 = DoubledCoord { col: 4, row: 2 };
     assert_eq!(expected_hex, HexDoubled::r_to_cube(coord2));
+}
+
+#[test]
+fn test_fractional_behavior() {
+    let a = FractionalHex::new(1.0, -2.0);
+    let b = FractionalHex::new(1.1, -2.2);
+    let c = FractionalHex::new(1.000_000_000_000_000_9, -2.000_000_000_000_001_3);
+    let eps = f64::EPSILON;
+
+    assert_ne!(1.0, c.q());
+    assert_ne!(-2.0, c.r());
+    assert_ne!(1.0, c.s());
+
+    assert_float_eq!(a, b, abs_all <= 0.25);
+    assert_float_eq!(a, c, rmax_all <= 4.0 * eps);
+    assert_float_eq!(a, c, ulps_all <= 4);
+}
+
+#[test]
+pub fn test_hashing() {
+    let mut map: HashMap<Hex, &'static str> = HashMap::new();
+    map.insert(Hex::new(1, 1), "foo");
+
+    let hex1 = Hex::new(1, 1);
+    let hex2 = Hex::new(1, 2);
+
+    assert!(map.get(&hex2).is_none());
+    assert!(map.get(&hex1).is_some());
+
+    assert_eq!(*map.get(&hex1).unwrap(), "foo");
 }

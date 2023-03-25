@@ -1,8 +1,8 @@
-use float_eq::{FloatEq, FloatEqUlpsEpsilon, UlpsEpsilon};
+use float_eq::derive_float_eq;
 use std::cmp::max;
 use std::ops::{Neg, Sub};
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub struct Hex {
     q: i32,
     r: i32,
@@ -28,6 +28,13 @@ impl Hex {
     }
 }
 
+#[derive_float_eq(
+    ulps_tol = "PointUlps",
+    ulps_tol_derive = "Clone, Copy, Debug, PartialEq",
+    debug_ulps_diff = "PointUlpsDebugUlpsDiff",
+    debug_ulps_diff_derive = "Clone, Copy, Debug, PartialEq",
+    all_tol = "f64"
+)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct FractionalHex {
     q: f64,
@@ -51,57 +58,6 @@ impl FractionalHex {
 
     pub fn s(&self) -> f64 {
         self.s
-    }
-}
-
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub struct FractionalHexUlps {
-    q: UlpsEpsilon<f64>,
-    r: UlpsEpsilon<f64>,
-    s: UlpsEpsilon<f64>,
-}
-
-impl FloatEqUlpsEpsilon for FractionalHex {
-    type UlpsEpsilon = FractionalHexUlps;
-}
-
-impl FloatEq for FractionalHex {
-    type Epsilon = FractionalHex;
-
-    fn eq_abs(&self, other: &Self, max_diff: &FractionalHex) -> bool {
-        self.q.eq_abs(&other.q, &max_diff.q)
-            && self.r.eq_abs(&other.r, &max_diff.r)
-            && self.s.eq_abs(&other.s, &max_diff.s)
-    }
-
-    fn eq_rmax(&self, other: &Self, max_diff: &FractionalHex) -> bool {
-        self.q.eq_rmax(&other.q, &max_diff.q)
-            && self.r.eq_rmax(&other.r, &max_diff.r)
-            && self.s.eq_rmax(&other.s, &max_diff.s)
-    }
-
-    fn eq_rmin(&self, other: &Self, max_diff: &FractionalHex) -> bool {
-        self.q.eq_rmin(&other.q, &max_diff.q)
-            && self.r.eq_rmin(&other.r, &max_diff.r)
-            && self.s.eq_rmin(&other.s, &max_diff.s)
-    }
-
-    fn eq_r1st(&self, other: &Self, max_diff: &FractionalHex) -> bool {
-        self.q.eq_r1st(&other.q, &max_diff.q)
-            && self.r.eq_r1st(&other.r, &max_diff.r)
-            && self.s.eq_r1st(&other.s, &max_diff.s)
-    }
-
-    fn eq_r2nd(&self, other: &Self, max_diff: &FractionalHex) -> bool {
-        self.q.eq_r2nd(&other.q, &max_diff.q)
-            && self.r.eq_r2nd(&other.r, &max_diff.r)
-            && self.s.eq_r2nd(&other.s, &max_diff.s)
-    }
-
-    fn eq_ulps(&self, other: &Self, max_diff: &UlpsEpsilon<FractionalHex>) -> bool {
-        self.q.eq_ulps(&other.q, &max_diff.q)
-            && self.r.eq_ulps(&other.r, &max_diff.r)
-            && self.s.eq_ulps(&other.s, &max_diff.s)
     }
 }
 

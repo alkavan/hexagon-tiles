@@ -1,6 +1,6 @@
 [package]
 name = "hexagon_tiles"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Igal Alkon"]
 edition = "2018"
 description = "A utility library that allows working with the hexagon shape and related math."
@@ -13,4 +13,4 @@ keywords = ["gamedev", "math"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-float_eq = "0.5.0"
+float_eq = {version="~1.0.1", features = ["derive"]}
