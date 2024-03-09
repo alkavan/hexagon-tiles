@@ -1,6 +1,6 @@
 [package]
 name = "hexagon_tiles"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Igal Alkon"]
 edition = "2018"
 description = "A utility library that allows working with the hexagon shape and related math."

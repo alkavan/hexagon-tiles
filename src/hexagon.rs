@@ -29,9 +29,9 @@ impl Hex {
 }
 
 #[derive_float_eq(
-    ulps_tol = "PointUlps",
+    ulps_tol = "HexUlps",
     ulps_tol_derive = "Clone, Copy, Debug, PartialEq",
-    debug_ulps_diff = "PointUlpsDebugUlpsDiff",
+    debug_ulps_diff = "HexUlpsDebugUlpsDiff",
     debug_ulps_diff_derive = "Clone, Copy, Debug, PartialEq",
     all_tol = "f64"
 )]
